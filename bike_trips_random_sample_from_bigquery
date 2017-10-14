@@ -1,0 +1,20 @@
+library(devtools)
+library(bigrquery)
+
+##### Citibike
+# Project name for the group
+project <- "animated-surfer-180415" # put your project ID here
+
+# sql code to pull a random sample of the bike trips trips data from BigQuery
+# The "3" in "RAND(3)" is a seed; the <.03 is essentially the # of records using a % of total that we want in our sample
+# the "<.03" gives just shy of 1 million records
+# Note: I had to add "max_pages = 100" which is normally defaulted to 10; each page has 10,000 records, so 100 works
+# Note: I also had to set to True " use_legacy_sql = TRUE" to accomodate the max_pages
+sql_trips_rs <- "SELECT * FROM [bigquery-public-data.new_york.citibike_trips] WHERE RAND(3) <.03"
+
+
+# Execute the query and store the result for trips in NY
+bike_trips_rs <- query_exec(sql_trips_rs, project = project, use_legacy_sql = TRUE, max_pages = 100)
+
+# Save an object to RDS file
+saveRDS(bike_trips_rs, file = "bike_trips_rs.rds")
